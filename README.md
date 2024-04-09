@@ -1,5 +1,5 @@
 # Project Name
-PM Laboratory work no#2: Building a platformer
+PM Laboratory work no#3: Sandbox using Unity
 
 ## Description
 This project serves as the foundational work for Laboratory No. 2 in the Video Game Design Course.
