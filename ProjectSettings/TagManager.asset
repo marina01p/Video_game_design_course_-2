@@ -7,6 +7,7 @@ TagManager:
   - obj_one
   - obj_two
   - obj_three
+  - obj_four
   layers:
   - Default
   - TransparentFX

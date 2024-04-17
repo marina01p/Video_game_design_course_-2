@@ -20,6 +20,8 @@ public class Spawner : MonoBehaviour
     // UI
     [SerializeField] private TextMeshProUGUI[] countTexts;
 
+    // Invetory
+    [SerializeField] private Inventory inventory;
 
     void Start()
     {
@@ -41,6 +43,11 @@ public class Spawner : MonoBehaviour
         UpdateCountTexts();
     }
 
+    void OnDestroy()
+    {
+        Collectible.OnCollectibleCollected -= CollectibleCollected;
+    }
+
     IEnumerator SpawnWithDelay(int index)
     {
         while (true)
@@ -53,19 +60,29 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    private void CollectibleCollected(Collectible collectible)
+private void CollectibleCollected(Collectible collectible)
+{
+    // Use the tag of the collectible as the item type ID
+    string itemTypeID = collectible.gameObject.tag;
+
+    // Add the collected item type to the inventory
+    inventory.AddItem(itemTypeID); // Make sure AddItem accepts a string now, not a GameObject
+
+    // Update the prefab count and UI
+    for (int i = 0; i < prefabConfigs.Length; i++)
     {
-        for (int i = 0; i < prefabConfigs.Length; i++)
+        if (prefabConfigs[i].prefab.tag == collectible.gameObject.tag)
         {
-            if (prefabConfigs[i].prefab.tag == collectible.gameObject.tag)
-            {
-                collectedPrefabsCount[i]++;
-                UpdateCountTexts();
-                OnPrefabCountChanged?.Invoke();
-                break;
-            }
+            collectedPrefabsCount[i]++;
+            UpdateCountTexts();
+            OnPrefabCountChanged?.Invoke();
+            break;
         }
     }
+
+    Destroy(collectible.gameObject); // Destroy the collectible after adding to inventory
+}
+
 
     private void SpawnPrefab(int index)
     {
@@ -91,4 +108,6 @@ public class Spawner : MonoBehaviour
             }
         }
     }
+
+
 }
