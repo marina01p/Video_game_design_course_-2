@@ -1,18 +1,15 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
 {
-    public event Action OnInventoryChanged;
-    public List<InventoryItem> items = new List<InventoryItem>();
-
-    // pentru UI
     public GameObject inventoryPanelUI;
     public GameObject[] slots;
+
+    public List<InventoryItem> items = new List<InventoryItem>(); 
 
     void Start()
     {
@@ -20,70 +17,55 @@ public class Inventory : MonoBehaviour
         UpdateInventoryDisplay();
     }
 
-    
-    public void AddItem(string itemTypeID)
+public void AddItem(string itemTypeID, Sprite itemIcon)
+{
+    InventoryItem foundItem = items.Find(item => item.itemTypeID == itemTypeID);
+    if (foundItem != null)
     {
-        InventoryItem foundItem = items.Find(item => item.itemTypeID == itemTypeID);
-
-        if (foundItem != null)
-        {
-            foundItem.quantity++;
-        }
-        else
-        {
-            items.Add(new InventoryItem(itemTypeID, 1));
-        }
-
-        UpdateInventoryDisplay();
-        OnInventoryChanged?.Invoke();
+        foundItem.quantity++;
+        Debug.Log("Item added: " + itemTypeID + " new count: " + foundItem.quantity);
+    }
+    else
+    {
+        items.Add(new InventoryItem(itemTypeID, 1, itemIcon));
+        Debug.Log("New item added: " + itemTypeID);
     }
 
-    public void RemoveItem(string itemTypeID)
-    {
-        InventoryItem foundItem = items.Find(item => item.itemTypeID == itemTypeID);
-    
-        if (foundItem != null)
-        {
-            foundItem.quantity--;
-            if (foundItem.quantity <= 0)
-            {
-                items.Remove(foundItem);
-            }
-        }
-        UpdateInventoryDisplay();
-    }
+    UpdateInventoryDisplay();
+}
 
-    void Update()
-    {
-        // pentru UI
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            GetComponent<Inventory>().ShowInventory();
-        }
-    }
 
     void UpdateInventoryDisplay()
     {
         foreach (GameObject slot in slots)
         {
-            slot.GetComponentInChildren<TextMeshProUGUI>().text = "";
-        }
+            TextMeshProUGUI slotText = slot.GetComponentInChildren<TextMeshProUGUI>();
+            Image slotImage = slot.GetComponentInChildren<Image>();
 
+            slotText.text = "";
+            slotImage.sprite = null;
+            slotImage.enabled = false;
 
-        foreach (InventoryItem item in items)
-        {
-            GameObject slot = Array.Find(slots, slot => slot.name == item.itemTypeID);
-            if (slot != null)
+            InventoryItem item = items.Find(i => i.itemTypeID == slot.name);
+            if (item != null && item.quantity > 0)
             {
-                TextMeshProUGUI slotText = slot.GetComponentInChildren<TextMeshProUGUI>();
                 slotText.text = item.quantity.ToString();
+                slotImage.sprite = item.itemIcon;
+                slotImage.enabled = true;
             }
         }
     }
 
-    // pentru UI
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            inventoryPanelUI.SetActive(!inventoryPanelUI.activeSelf);  // Toggle inventory UI
+        }
+    }
+
     public void ShowInventory()
     {
-        inventoryPanelUI.SetActive(!inventoryPanelUI.activeSelf);
+        inventoryPanelUI.SetActive(!inventoryPanelUI.activeSelf);  // Toggle inventory panel visibility
     }
 }

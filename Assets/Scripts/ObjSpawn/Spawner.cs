@@ -23,30 +23,32 @@ public class Spawner : MonoBehaviour
     // Invetory
     [SerializeField] private Inventory inventory;
 
-    void Start()
+void Start()
+{
+
+    collectedPrefabsCount = new int[prefabConfigs.Length];
+
+
+    for (int i = 0; i < prefabConfigs.Length; i++)
     {
-        // se inițializează un array numit collectedPrefabsCount pentru a ține evidența prefaburilor colectate
-        collectedPrefabsCount = new int[prefabConfigs.Length];
-
-        // ciclu "for" care iterează de la 0 până la lungimea array-ului prefabConfigs
-        // crește variabila i cu o unitate la fiecare iterație (i++).
-        for (int i = 0; i < prefabConfigs.Length; i++)
-        {
-            // se lansează o coroutină (funcție care gestionează așteptări/întârzieri a unor comenzi) pentru a genera obiectele la un interval de timp decalrat în unity.
-            StartCoroutine(SpawnWithDelay(i));
-        }
-
-        // se apelează metoda CollectibleCollected de fiecare dacă când este colectat un obiect
-        Collectible.OnCollectibleCollected += CollectibleCollected;
-        
-        // Se apelează metoda UpdateCountTexts pentru a afișa numărul de obiecte colectate
-        UpdateCountTexts();
+        StartCoroutine(SpawnWithDelay(i));
     }
 
-    void OnDestroy()
-    {
-        Collectible.OnCollectibleCollected -= CollectibleCollected;
-    }
+    UpdateCountTexts();
+}
+
+
+private void OnEnable()
+{
+    Collectible.OnCollectibleCollected += CollectibleCollected;
+}
+
+private void OnDisable()
+{
+    Collectible.OnCollectibleCollected -= CollectibleCollected;
+}
+
+
 
     IEnumerator SpawnWithDelay(int index)
     {
@@ -62,13 +64,12 @@ public class Spawner : MonoBehaviour
 
 private void CollectibleCollected(Collectible collectible)
 {
-    // Use the tag of the collectible as the item type ID
+
     string itemTypeID = collectible.gameObject.tag;
+    Sprite itemIcon = collectible.itemIcon;
 
-    // Add the collected item type to the inventory
-    inventory.AddItem(itemTypeID); // Make sure AddItem accepts a string now, not a GameObject
+    inventory.AddItem(itemTypeID, itemIcon);
 
-    // Update the prefab count and UI
     for (int i = 0; i < prefabConfigs.Length; i++)
     {
         if (prefabConfigs[i].prefab.tag == collectible.gameObject.tag)
@@ -80,8 +81,9 @@ private void CollectibleCollected(Collectible collectible)
         }
     }
 
-    Destroy(collectible.gameObject); // Destroy the collectible after adding to inventory
+    Destroy(collectible.gameObject);
 }
+
 
 
     private void SpawnPrefab(int index)

@@ -7,13 +7,16 @@ public class InventoryItem
 {
     public string itemTypeID;
     public int quantity;
+    public Sprite itemIcon;
 
-    public InventoryItem(string typeID, int count)
+    public InventoryItem(string typeID, int count, Sprite icon)
     {
         itemTypeID = typeID;
         quantity = count;
+        itemIcon = icon;
     }
 }
+
 
 
 
