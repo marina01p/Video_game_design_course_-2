@@ -10,6 +10,4 @@ public class PrefabConfig
     public int maxNumberOfPrefabs;
     public float delayBetweenSpawns;
     public string tag;
-    public TextMeshPro textDisplay;
 }
-

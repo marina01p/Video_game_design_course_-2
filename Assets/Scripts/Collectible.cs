@@ -5,18 +5,14 @@ using UnityEngine;
 
 public class Collectible : MonoBehaviour
 {
-    public static event Action<Collectible> OnCollectibleCollected;
-    public string itemTypeID;
-    public Sprite itemIcon;
+    public Item itemData;
 
-private void OnTriggerEnter2D(Collider2D other)
-{
-    if (other.CompareTag("Player"))
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Collectible collected by player");
-        OnCollectibleCollected?.Invoke(this);
-        Destroy(gameObject);
+        if (other.CompareTag("Player"))
+        {
+            InventoryManager.Instance.AddItem(itemData);
+            Destroy(gameObject);
+        }
     }
-}
-
 }
