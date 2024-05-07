@@ -1,17 +1,17 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
-    public static bool CanAddItems = false;
     public GameObject itemTemplate;
     public Transform itemsParent;
+    public static bool CanAddItems = false;
     public List<Item> items = new List<Item>();
+    private Dictionary<Item, GameObject> itemUIs = new Dictionary<Item, GameObject>();
 
     void Awake()
     {
@@ -27,51 +27,61 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    void Start()
     {
-        StartCoroutine(DelayItemAddition());
+        StartCoroutine(EnableCollectionAfterDelay());
     }
 
-    IEnumerator DelayItemAddition()
+    IEnumerator EnableCollectionAfterDelay()
     {
-        ResetInventory();
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1.0f);
         CanAddItems = true;
     }
 
-    void OnDestroy()
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    public void ResetInventory()
-    {
-        items.Clear();
-        UpdateUI();
+        StartCoroutine(EnableCollectionAfterDelay());
     }
 
     public void UpdateUI()
     {
-        foreach (Transform child in itemsParent)
+        List<Item> itemsToRemove = new List<Item>();
+        foreach (var pair in itemUIs)
         {
-            Destroy(child.gameObject);
+            if (!items.Contains(pair.Key) || pair.Key.count == 0)
+            {
+                Destroy(pair.Value);
+                itemsToRemove.Add(pair.Key);
+            }
+        }
+
+        foreach (Item item in itemsToRemove)
+        {
+            itemUIs.Remove(item);
         }
 
         foreach (Item item in items)
         {
-            GameObject newItemUI = Instantiate(itemTemplate, itemsParent);
-            InventoryItemUI itemUIScript = newItemUI.GetComponent<InventoryItemUI>();
-            itemUIScript.SetItemData(item);
-            newItemUI.SetActive(true);
+            GameObject uiObject;
+            if (itemUIs.TryGetValue(item, out uiObject))
+            {
+                InventoryItemUI ui = uiObject.GetComponent<InventoryItemUI>();
+                ui.SetItemData(item);
+            }
+            else
+            {
+                GameObject newItemUI = Instantiate(itemTemplate, itemsParent);
+                InventoryItemUI newUI = newItemUI.GetComponent<InventoryItemUI>();
+                newUI.SetItemData(item);
+                newItemUI.SetActive(true);
+                itemUIs[item] = newItemUI;
+            }
         }
     }
 
     public void AddItem(Item itemToAdd)
     {
-        // if (!CanAddItems)
-        // {
-        //     return;
-        // }
+        if (!CanAddItems) return;
 
         Item existingItem = items.Find(item => item.itemName == itemToAdd.itemName);
         if (existingItem != null)
@@ -80,21 +90,20 @@ public class InventoryManager : MonoBehaviour
         }
         else
         {
-            itemToAdd.count = 1;
             items.Add(itemToAdd);
+            itemToAdd.count = 1;
         }
-
         UpdateUI();
     }
+
     public void DropItemToWorld(Item item, Vector2 dropPosition)
     {
-        if (item != null && item.worldPrefab != null)
+        if (item != null && item.worldPrefab != null && item.count > 0)
         {
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(dropPosition.x, dropPosition.y, Camera.main.nearClipPlane));
-            worldPosition.z = 0;
             Instantiate(item.worldPrefab, worldPosition, Quaternion.identity);
-
             item.count--;
+
             if (item.count <= 0)
             {
                 items.Remove(item);
@@ -102,5 +111,10 @@ public class InventoryManager : MonoBehaviour
 
             UpdateUI();
         }
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

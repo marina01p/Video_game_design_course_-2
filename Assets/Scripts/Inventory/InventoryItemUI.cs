@@ -46,7 +46,16 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         {
             InventoryManager.Instance.DropItemToWorld(itemData, eventData.position);
         }
+        
         transform.position = originalPosition;
         transform.SetParent(originalParent);
+        UpdateItemUI();
     }
+
+    public void UpdateItemUI()
+    {
+        GetComponentInChildren<TextMeshProUGUI>().text = itemData.count > 0 ? itemData.count.ToString() : "";
+        this.gameObject.SetActive(itemData.count > 0);
+    }
+
 }
