@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: obj_two
   icon: {fileID: 2747690628134850419, guid: 255e6b6b081361b45815307ecff4a0a6, type: 3}
-  count: 0
+  count: 36
+  worldPrefab: {fileID: 6682880524121806601, guid: a4e080fe8bf04094a93ff74e85035296, type: 3}

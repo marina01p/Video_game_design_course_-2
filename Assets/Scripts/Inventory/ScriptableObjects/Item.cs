@@ -8,4 +8,5 @@ public class Item : ScriptableObject
     public string itemName;
     public Sprite icon;
     public int count = 1;
+    public GameObject worldPrefab;
 }
