@@ -8,7 +8,7 @@ public class Spawner : MonoBehaviour
     public PrefabConfig[] PrefabConfigs => prefabConfigs;
 
     private int[] collectedPrefabsCount;
-    public event Action OnPrefabCountChanged;
+    // public event Action OnPrefabCountChanged;
 
     public SpriteRenderer referenceSprite;
 
