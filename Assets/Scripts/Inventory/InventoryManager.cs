@@ -30,6 +30,7 @@ public class InventoryManager : MonoBehaviour
     void Start()
     {
         StartCoroutine(EnableCollectionAfterDelay());
+        ClearInventory();
     }
 
     IEnumerator EnableCollectionAfterDelay()
@@ -41,6 +42,18 @@ public class InventoryManager : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         StartCoroutine(EnableCollectionAfterDelay());
+        ClearInventory();
+    }
+
+    void ClearInventory()
+    {
+        items.Clear();
+        foreach (var pair in itemUIs)
+        {
+            Destroy(pair.Value);
+        }
+        itemUIs.Clear();
+        UpdateUI();
     }
 
     public void UpdateUI()
