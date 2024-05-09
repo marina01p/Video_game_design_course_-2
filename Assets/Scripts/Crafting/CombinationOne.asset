@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b07dd30d27b77e49b70b4040d82253c, type: 3}
   m_Name: CombinationOne
   m_EditorClassIdentifier: 
-  inputItem1: {fileID: 0}
-  inputItem2: {fileID: 0}
-  resultPrefab: {fileID: 0}
+  inputItem1: {fileID: 11400000, guid: 6850650ae6e4d3946bf8d39a8652ef48, type: 2}
+  inputItem2: {fileID: 11400000, guid: 5fbadf64e42da3a40863ed9806aeadc5, type: 2}
+  resultPrefab: {fileID: 6682880524121806601, guid: b6125ad44d2416b43af84809cd69a923, type: 3}
